@@ -5,6 +5,12 @@ import java.util.Arrays;
 
 public class HashSimulator
 {
+    /**
+     * runHashSimulation, runs the hash simulation three times, for each of the three hashing algorithms.
+     *
+     * @param strings, the strings to hash
+     * @param size, the size of the hash table to create
+     */
     public int[] runHashSimulation(String[] strings, int size)
     {
         int[] results = new int[6]; 
@@ -69,7 +75,13 @@ public class HashSimulator
 
         return results;
     }
-
+    
+    /**
+     * H1 is a hashing function that sums a string characters.
+     *
+     * @param astring, string to hash
+     * @param size, size of the hashtable
+     */
     public int H1(String astring, int size)
     {
         int wa = 0;
@@ -80,6 +92,12 @@ public class HashSimulator
         return wa % size;
     }
 
+    /**
+     * H2 is a hashing function that multiplies the character numbers by 26^i.
+     *
+     * @param astring, string to hash
+     * @param size, size of the hashtable
+     */
     public int H2(String astring, int size)
     {
         long wa = 0;
@@ -90,7 +108,13 @@ public class HashSimulator
         }
         return (int)(wa % (long) size);
     }
-
+    
+    /**
+     * H3 is a hashing function that.
+     *
+     * @param astring, string to hash
+     * @param size, size of the hashtable
+     */
     public int H3(String astring, int size)
     {
         long wa = 0;
@@ -102,7 +126,9 @@ public class HashSimulator
         }
         return (int)(wa % (long) size);
     }
-    
+   
+    // Testing method
+    //
     public static void main(String[] args)
     {
         String[] files = {"37names.txt", "792names.txt", "5705names.txt"};
