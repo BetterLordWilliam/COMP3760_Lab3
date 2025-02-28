@@ -3,6 +3,9 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Arrays;
 
+// Will Otterbein
+// A01372608
+
 public class HashSimulator
 {
     public int[] runHashSimulation(String[] strings, int size)
@@ -20,9 +23,7 @@ public class HashSimulator
             while (ht[h] != null)
             {
                 pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
+                h = (h + 1) % size;
             }
             ht[h] = s;
         }
@@ -39,9 +40,7 @@ public class HashSimulator
             while (ht[h] != null)
             {
                 pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
+                h = (h + 1) % size;
             }
             ht[h] = s;
         }
@@ -58,9 +57,7 @@ public class HashSimulator
             while (ht[h] != null)
             {
                 pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
+                h = (h + 1) % size;
             }
             ht[h] = s;
         }
@@ -88,19 +85,21 @@ public class HashSimulator
         {
             wa += (chars[i] - 64) * Math.pow(26, i);
         }
-        return (int)(wa % (long) size);
+        // Ensure correct size, not out of bounds
+        return (int)((wa % size + size) % size);
     }
 
     public int H3(String astring, int size)
     {
-        long wa = 0;
+        long wa = 5381;
         char[] chars = astring.toCharArray();
         for (int i = 0; i < chars.length; i++)
         {
-            wa += (chars[i] - 64) * Math.pow(chars[i], i);
-
+            wa = (((wa * 31)) + chars[i]);
+            wa ^= (wa >> 7);
         }
-        return (int)(wa % (long) size);
+        // Ensure correct size, not out of bounds
+        return (int)((wa % size + size) % size);
     }
     
     public static void main(String[] args)
