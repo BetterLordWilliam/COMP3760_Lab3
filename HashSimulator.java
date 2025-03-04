@@ -61,7 +61,7 @@ public class HashSimulator {
         runHash(strings, results, size, 0, 1, this::H1);
         runHash(strings, results, size, 2, 3, this::H2);
         runHash(strings, results, size, 4, 5, this::H3);
-        showWinner(results);
+        // showWinner(results);
         epic = 0;
         return results;
     }
