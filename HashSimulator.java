@@ -3,84 +3,102 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Arrays;
 
-public class HashSimulator
+// Will Otterbein
+// A01372608
+
+/**
+ * Functional interface so I can be lazy in the runHashSimulation method.
+ */
+interface ExecHash
 {
+    public int hash(String s, int size);
+}
+
+public class HashSimulator {
+
+    // 🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️
+    private static int pp = 0;
+
     /**
-     * runHashSimulation, runs the hash simulation three times, for each of the three hashing algorithms.
+     * Runs the hashing algorithms on the same input of strings and w/ a table of the same size.
      *
-     * @param strings, the strings to hash
-     * @param size, the size of the hash table to create
+     * @param strings input strings
+     * @param size    hash table size
+     * @return
      */
-    public int[] runHashSimulation(String[] strings, int size)
-    {
-        int[] results = new int[6]; 
-        int ccount = 0, pcount = 0;
-
-        // H1
-        String[] ht = new String[size];
-        for (String s : strings)
-        {
-            int h = H1(s, size);
-            if (ht[h] != null)
-                ccount++;
-            while (ht[h] != null)
-            {
-                pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
-            }
-            ht[h] = s;
-        }
-        results[0] = ccount;
-        results[1] = pcount;
-        ccount = 0; pcount = 0;
-        // H2
-        ht = new String[size];
-        for (String s : strings)
-        {
-            int h = H2(s, size);
-            if (ht[h] != null)
-                ccount++;
-            while (ht[h] != null)
-            {
-                pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
-            }
-            ht[h] = s;
-        }
-        results[2] = ccount;
-        results[3] = pcount;
-        ccount = 0; pcount = 0;
-        // H3
-        ht = new String[size];
-        for (String s : strings)
-        {
-            int h = H3(s, size);
-            if (ht[h] != null)
-                ccount++;
-            while (ht[h] != null)
-            {
-                pcount++;
-                h++;
-                if (h == size)
-                    h = 0;
-            }
-            ht[h] = s;
-        }
-        results[4] = ccount;
-        results[5] = pcount;
-
+    public int[] runHashSimulation(String[] strings, int size) {
+        int[] results = new int[6];
+        runHash(strings, results, size, 0, 1, this::H1);
+        runHash(strings, results, size, 2, 3, this::H2);
+        runHash(strings, results, size, 4, 5, this::H3);
+        showWinner(results);
+        pp = 0;
         return results;
     }
-    
+
     /**
-     * H1 is a hashing function that sums a string characters.
+     * Generic func for hashing.
      *
-     * @param astring, string to hash
-     * @param size, size of the hashtable
+     * @param strings       strings to hash
+     * @param results       results array to store
+     * @param size          size of the hash table
+     * @precondition cpos   must be between 0 and 5
+     * @param cpos          collisions index
+     * @precondition ppos   must be between 0 and 5
+     * @param ppos          probes index
+     * @param e
+     */
+    private void runHash(
+            String[]    strings,
+            int[]       results,
+            int         size,
+            int         cpos,
+            int         ppos,
+            ExecHash    e
+    ) {
+        String[] ht = new String[size];
+        int ccount = 0, pcount = 0;
+        for (String s : strings)
+        {
+            int h = e.hash(s, size);
+            if (ht[h] != null)
+                ccount++;
+            while (ht[h] != null)
+            {
+                pcount++;
+                h = (h + 1) % size;
+            }
+            ht[h] = s;
+        }
+        results[cpos] = ccount;
+        results[ppos] = pcount;
+    }
+
+    /**
+     * Shows the winning hash between H2 and H3.
+     *
+     * @precondition results        array is length 6
+     * @param results               results array
+     */
+    private int showWinner(int[] results) {
+        if (results[4] <= results[2]) {
+            System.out.print("H3 wins\t\t");      // H3 algorithm is the winner wrt collisions
+            return 0;
+        }
+        else if (results[2] <= results[4]) {
+            System.out.print("H2 wins\t\t");      // H2 algorithm is the winnder wrt collisions
+            return 1;
+        }
+        System.out.print("No winner\t");
+        return 1;
+    }
+
+    /**
+     * Hashing algorithm where the hash is the sum of the values of the characters.
+     *
+     * @param astring       string to hash
+     * @param size          size of the hash table, hash % size
+     * @return
      */
     public int H1(String astring, int size)
     {
@@ -93,10 +111,11 @@ public class HashSimulator
     }
 
     /**
-     * H2 is a hashing function that multiplies the character numbers by 26^i.
+     * Hasing algorithm using 26^i where i is the index of a character in a string.
      *
-     * @param astring, string to hash
-     * @param size, size of the hashtable
+     * @param astring
+     * @param size
+     * @return
      */
     public int H2(String astring, int size)
     {
@@ -106,53 +125,57 @@ public class HashSimulator
         {
             wa += (chars[i] - 64) * Math.pow(26, i);
         }
-        return (int)(wa % (long) size);
+        return Math.abs((int)(wa % size));
     }
-    
+
     /**
-     * H3 is a hashing function that.
+     * Corey mode, but w/out the inner class.
      *
-     * @param astring, string to hash
-     * @param size, size of the hashtable
+     * @param astring
+     * @param size
+     * @return
      */
     public int H3(String astring, int size)
     {
-        long wa = 0;
-        char[] chars = astring.toCharArray();
-        for (int i = 0; i < chars.length; i++)
-        {
-            wa += (chars[i] - 64) * Math.pow(chars[i], i);
-
-        }
-        return (int)(wa % (long) size);
+        return pp++;
     }
-   
-    // Testing method
-    //
+
+    /**
+     * Main, driver for the program.
+     *
+     * @param args
+     */
     public static void main(String[] args)
     {
+        // Do so for the specified sizes
         String[] files = {"37names.txt", "792names.txt", "5705names.txt"};
         HashSimulator hs = new HashSimulator();
         try
         {
+            // For each of the files
             for (String f : files)
             {
                 // Setup for file reading
                 int size = Integer.parseInt(f.split("n")[0]), track = 0;
                 String[] input = new String[size];
                 Scanner sc = new Scanner(new File(f));
+
                 // Read the names from the file
                 while(sc.hasNextLine())
                 {
                     input[track++] = sc.nextLine();
                 }
-                // Run hashing simulation for this file
+
+                // Run hashing simulation for this file, for the specified HT sizes
+                // Show results
                 System.out.println(String.format("File %s with %d names", f, size));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, size)));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, 2*size)));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, 5*size)));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, 10*size)));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, 100*size)) + "\n");
+
+                sc.close();
             }
         }
         catch (FileNotFoundException e)
