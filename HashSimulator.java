@@ -159,7 +159,7 @@ public class HashSimulator {
     }
 
     /**
-     * Corey mode, but w/out the inner class.
+     * Corey mode, but w/out the inner class. Just to minimize collisions, that's all that matters.
      *
      * @param astring
      * @param size
