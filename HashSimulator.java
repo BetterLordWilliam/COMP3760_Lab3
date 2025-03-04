@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 // Will Otterbein
 // A01372608
+// Set D
 
 /**
  * Functional interface so I can be lazy in the runHashSimulation method.
@@ -14,10 +15,39 @@ interface ExecHash
     public int hash(String s, int size);
 }
 
+/**
+ * HashSimulator compares three different hashing algorithms.
+ * 
+ * H1, basic, hash is sum of characters in a string % size of HT
+ * H2, less basic, actually kinda good, hash is result of ∑ ((char c in string) * 26^i)
+ * H3, Min/max the collisions and probes... DONUT...
+ * 
+ * Output:
+ * File 37names.txt with 37 names
+ * H3 wins         [15, 123, 18, 179, 0, 0]
+ * H3 wins         [11, 32, 10, 19, 0, 0]
+ * H3 wins         [9, 18, 3, 3, 0, 0]
+ * H3 wins         [9, 18, 0, 0, 0, 0]
+ * H3 wins         [9, 18, 0, 0, 0, 0]
+ * File 792names.txt with 792 names
+ * H3 wins         [741, 274951, 408, 16310, 0, 0]
+ * H3 wins         [741, 274938, 209, 455, 0, 0]
+ * H3 wins         [741, 274938, 86, 103, 0, 0]
+ * H3 wins         [741, 274938, 42, 49, 0, 0]
+ * H3 wins         [741, 274938, 4, 4, 0, 0]
+ * File 5705names.txt with 5705 names
+ * H3 wins         [5650, 15941439, 2861, 263249, 0, 0]
+ * H3 wins         [5650, 15941435, 1410, 3642, 0, 0]
+ * H3 wins         [5650, 15941435, 593, 842, 0, 0]
+ * H3 wins         [5650, 15941435, 290, 360, 0, 0]
+ * H3 wins         [5650, 15941435, 27, 28, 0, 0]
+ * 
+ * You may be able to tell why H3 dominates H2...
+ */
 public class HashSimulator {
 
     // 🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️🅱️
-    private static int pp = 0;
+    private static int epic = 0;
 
     /**
      * Runs the hashing algorithms on the same input of strings and w/ a table of the same size.
@@ -32,12 +62,12 @@ public class HashSimulator {
         runHash(strings, results, size, 2, 3, this::H2);
         runHash(strings, results, size, 4, 5, this::H3);
         showWinner(results);
-        pp = 0;
+        epic = 0;
         return results;
     }
 
     /**
-     * Generic func for hashing.
+     * Generic func for applying hash functions.
      *
      * @param strings       strings to hash
      * @param results       results array to store
@@ -137,7 +167,7 @@ public class HashSimulator {
      */
     public int H3(String astring, int size)
     {
-        return pp++;
+        return epic++;
     }
 
     /**
