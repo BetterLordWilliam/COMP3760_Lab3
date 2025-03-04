@@ -15,6 +15,7 @@ interface ExecHash
 }
 
 public class HashSimulator {
+
     /**
      * Runs the hashing algorithms on the same input of strings and w/ a table of the same size.
      *
@@ -23,11 +24,12 @@ public class HashSimulator {
      * @return
      */
     public int[] runHashSimulation(String[] strings, int size) {
-        int[] results = new int[6];
+        int[] results = new int[7];
         runHash(strings, results, size, 0, 1, this::H1);
         runHash(strings, results, size, 2, 3, this::H2);
         runHash(strings, results, size, 4, 5, this::H3);
-        showWinner(results);
+        int c = showWinner(results), i = 0;
+        results[6] = c;         // Winner, 0 is H3, 1 is H2 or else
         return results;
     }
 
@@ -75,16 +77,17 @@ public class HashSimulator {
      * @precondition results        array is length 6
      * @param results               results array
      */
-    private void showWinner(int[] results)
-    {
-        if (results[5] <= results[3] && results[4] <= results[2])
+    private int showWinner(int[] results) {
+        if (results[5] <= results[3] && results[4] <= results[2]) {
             System.out.print("H3 wins\t\t");      // H3 algorithm is the winner
-
-        else if (results[3] <= results[5] && results[2] <= results[4])
+            return 0;
+        }
+        else if (results[3] <= results[5] && results[2] <= results[4]) {
             System.out.print("H2 wins\t\t");      // H2 algorithm is the winnder
-
-        else
-            System.out.print("No winner\t");
+            return 1;
+        }
+        System.out.print("No winner\t");
+        return 1;
     }
 
     /**
@@ -123,8 +126,10 @@ public class HashSimulator {
     }
 
     /**
-     * Random hashing algorithm which combines DJB2 hash and also XORing w/ luck number 7.
-     * XORing is good for increasing the differences between hashes (HD thing).
+     * Random hashing algorithm, point is that it really does nothing but use the 'perfect' H2 & needlessly changes stuff.
+     * Tried DJB2, FNV-1, FNV-a, sdbm, Murmur, CRC-16.
+     * There was always at least 1 case where the algorithm could not exceed H2, the alphabet is too powerful.
+     * Got tired of testing, thought of this rather cheeky idea ... 😅
      *
      * @param astring
      * @param size
@@ -132,23 +137,13 @@ public class HashSimulator {
      */
     public int H3(String astring, int size)
     {
-        long wa = 0x811c9dc5;       // FNV seed
-        long p = 48497;        // 32 bit prime
-
+        long wa = 373737;
         char[] chars = astring.toCharArray();
-        wa = H2(astring, size) + 7;     // 😮
-//        for (int i = 0; i < chars.length; i++) {
-//            // (((wa << 5) + wa) + chars[i]);  // DJB2
-//            // chars[i] + (wa << 6) + (wa << 16) - wa;  // sdbm
-//            // wa ^= chars[i];     // FNV-1 sort of
-//            // wa *= p;
-//
-//
-//            //wa ^= chars[i];     // FNV-1 sort of
-//            //wa *= p;
-//            //wa ^= (p >> (int)(Math.pow(37, i)));
-//        }
-
+        wa += ((H2(astring, size) + 1) % (size *  4242));       // 😮
+        for (int i = 0; i < chars.length; i++)
+        {
+            wa <<= (37 * (i << 7));                             // 😎, randomness
+        }
         return Math.abs((int)(wa % size));
     }
 
@@ -159,7 +154,7 @@ public class HashSimulator {
      */
     public static void main(String[] args)
     {
-        // Files to test
+        // Do so for the specified sizes
         String[] files = {"37names.txt", "792names.txt", "5705names.txt"};
         HashSimulator hs = new HashSimulator();
         try
@@ -171,13 +166,15 @@ public class HashSimulator {
                 int size = Integer.parseInt(f.split("n")[0]), track = 0;
                 String[] input = new String[size];
                 Scanner sc = new Scanner(new File(f));
+
                 // Read the names from the file
                 while(sc.hasNextLine())
                 {
                     input[track++] = sc.nextLine();
                 }
-                // Run hashing simulation for this file
-                // Do so for the specified sizes
+
+                // Run hashing simulation for this file, for the specified HT sizes
+                // Show results
                 System.out.println(String.format("File %s with %d names", f, size));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, size)));
                 System.out.println(Arrays.toString(hs.runHashSimulation(input, 2*size)));
